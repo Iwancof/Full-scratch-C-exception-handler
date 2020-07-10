@@ -1,4 +1,5 @@
-struct Exception{} ;
+struct FirstException{} ;
+struct SecondException{} ;
 
 #ifdef __cplusplus
 extern "C" {
