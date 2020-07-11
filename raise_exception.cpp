@@ -4,26 +4,31 @@
 
 void unsafe_function() {
   try {
-    //printf("test\n");
-    throw SecondException();
-  } catch(FirstException x) {
-    printf("Unreachable(Catch incorrect exception)\n");
+    printf("nothing to do...\n");
+  } catch(FirstException& x) {
+    printf("Caught exception in wrong catch block...\n");
   }
-  printf("Unreachable(Exception must be catched)\n");
+
+  try {
+    throw SecondException();
+  } catch(FirstException& x) {
+    printf("Caught a FirstException\n");
+  }
+  printf("End of unsafe_function\n");
 }
 
 void handler() {
   try {
     unsafe_function();
-  } catch(FirstException x) {
-    printf("Catch first exception\n");
-  } catch(SecondException x) {
-    printf("Catch second exception\n");
+  } catch(FirstException& x) {
+    printf("Caught a First exception\n");
+  } catch(SecondException& x) {
+    printf("Caught a Second exception\n");
   }
+  printf("End of handler\n");
 }
-
-
 
 void seppuku() {
   handler();
 }
+
