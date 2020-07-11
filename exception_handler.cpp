@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<unwind.h>
 #include<stdint.h>
+#include<typeinfo>
 
 namespace __cxxabiv1 {
     struct __class_type_info {
@@ -45,14 +46,20 @@ struct LSDA_Header {
     
     start_encoding = read_ptr[0];
     type_encoding = read_ptr[1];
-    ttype = read_ptr[2];
+    types_table_offset = read_ptr[2];
 
     *lsda = read_ptr + sizeof(LSDA_Header);
     // lsdaをずらす。
+   
+    printf(" -- LSDA_Header --\n");
+    printf(" start_encoding: %x\n", start_encoding);
+    printf(" type_encoding: %x\n", type_encoding);
+    printf(" types_table_offset: %x\n", types_table_offset);
+    printf(" -----------------\n");
   }
   uint8_t start_encoding;
   uint8_t type_encoding;
-  uint8_t ttype;
+  uint8_t types_table_offset;
 };
 struct LSDA_Call_Site_Header {
   LSDA_Call_Site_Header(LSDA_ptr *lsda) {
@@ -60,6 +67,11 @@ struct LSDA_Call_Site_Header {
     encoding = read_ptr[0];
     length = read_ptr[1];
     *lsda = read_ptr + sizeof(LSDA_Call_Site_Header);
+
+    printf(" -- LSDA_Call_Site_Header --\n");
+    printf(" encoding: %x\n", encoding);
+    printf(" length: %x\n", length);
+    printf(" ---------------------------\n");
   }
   uint8_t encoding;
   uint8_t length;
@@ -133,26 +145,65 @@ _Unwind_Reason_Code __gxx_personality_v0(
   } else if(action & _UA_CLEANUP_PHASE) {
     printf("cleanup phace\n");
 
-    LSDA_ptr lsda = (uint8_t*)_Unwind_GetLanguageSpecificData(context);
+    const uintptr_t throw_ip = _Unwind_GetIP(context) - 1;
+    printf("thought in %lx\n", throw_ip + 1);
 
+    LSDA_ptr lsda = (uint8_t*)_Unwind_GetLanguageSpecificData(context);
+    
     LSDA_Header header(&lsda);
+    const LSDA_ptr types_table_start = lsda + header.types_table_offset;
+    // Headerの終わりから、その長さの先にはタイプ情報が入っている
+    
     LSDA_Call_Site_Header cs_header(&lsda);
     const LSDA_ptr lsda_cs_table_end = lsda + cs_header.length;
 
+    const LSDA_ptr action_table_start = lsda_cs_table_end;
+
+    // - LSDA_Header(start_encoding, type_encoding, types_table_offset)
+    //   - LSDA_Call_Site_Header(encoding, length) ---
+    //     - LSDA_Call_Site(start, len, lp, action)  |
+    //     - LSDA_Call_Site(start, len, lp, action)  |-cs_header_length
+    //     - LSDA_Call_Site(start, len, lp, action)  |
+    //     (length分ある)                            |
+    //   - デストラクタとか --------------------------
+    //   
+
     while(lsda < lsda_cs_table_end) {
-      LSDA_Call_Site cs(&lsda);
-      if(cs.lp != 0) {
-	int r0 = __builtin_eh_return_data_regno(0);
-	int r1 = __builtin_eh_return_data_regno(1);
+      LSDA_Call_Site cs(&lsda); 
+      // lsdaを読んで、すすめる
+      
+      const size_t action_offset = cs.action - 1;
+      const LSDA_ptr action = action_table_start + action_offset;
 
-	_Unwind_SetGR(context, r0, (uintptr_t)(unwind_exception));
-	_Unwind_SetGR(context, r1, (uintptr_t)(1));
+      int type_index = action[0];
+      printf("type index is %d\n", type_index);
+      printf("start is %d\n", types_table_start[-type_index]);
 
-	uintptr_t func_start = _Unwind_GetRegionStart(context);
-	_Unwind_SetIP(context, func_start + cs.lp);
-
-	break;
+      const std::type_info* catch_type_info = (std::type_info*)*(int*)(types_table_start - 4 * type_index);
+      printf("Caught type is %s\n", catch_type_info->name());
+      
+      if(cs.lp == 0) {
+	continue;
       }
+
+      uintptr_t func_start = _Unwind_GetRegionStart(context);
+      uintptr_t try_start = func_start + cs.start;
+      uintptr_t try_end = func_start + cs.start + cs.len;
+
+      // throw_ip が try_startとtry_endの間にあるか調べる。
+      
+      if(throw_ip < try_start || try_end < throw_ip) {
+	continue;
+      }
+
+      int r0 = __builtin_eh_return_data_regno(0);
+      int r1 = __builtin_eh_return_data_regno(1);
+
+      _Unwind_SetGR(context, r0, (uintptr_t)(unwind_exception));
+      _Unwind_SetGR(context, r1, (uintptr_t)(1));
+
+      _Unwind_SetIP(context, func_start + cs.lp);
+      break;
     }
 
     return _URC_INSTALL_CONTEXT;
