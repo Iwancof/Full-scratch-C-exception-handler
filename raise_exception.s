@@ -4,21 +4,26 @@
 .Ltext0:
 	.section	.rodata
 .LC0:
-	.string	"nothing to do..."
-	.align 8
+	.string	"throw!!"
 .LC1:
-	.string	"Caught exception in wrong catch block..."
+	.string	"[handler2] end"
+	.align 8
 .LC2:
-	.string	"Caught a FirstException"
+	.string	"[handler2] Caught a FirstException"
 .LC3:
-	.string	"End of unsafe_function"
+	.string	"\033[41m NG \033[40m"
+	.align 8
+.LC4:
+	.string	"[handler2] Caught a SecondException"
+.LC5:
+	.string	"\033[41m OK \033[40m"
 	.text
-	.globl	_Z15unsafe_functionv
-	.type	_Z15unsafe_functionv, @function
-_Z15unsafe_functionv:
+	.globl	_Z8handler2v
+	.type	_Z8handler2v, @function
+_Z8handler2v:
 .LFB11:
 	.file 1 "raise_exception.cpp"
-	.loc 1 6 24
+	.loc 1 32 17
 	.cfi_startproc
 	.cfi_personality 0x3,__gxx_personality_v0
 	.cfi_lsda 0x3,.LLSDA11
@@ -30,88 +35,113 @@ _Z15unsafe_functionv:
 	push	rbx
 	sub	rsp, 24
 	.cfi_offset 3, -24
-	.loc 1 8 11
+	.loc 1 34 11
 	mov	edi, OFFSET FLAT:.LC0
 .LEHB0:
 	call	puts
-.LEHE0:
-.L4:
-	.loc 1 14 27
+	.loc 1 35 27
 	mov	edi, 1
 	call	__cxa_allocate_exception
 	mov	edx, 0
 	mov	esi, OFFSET FLAT:_ZTI15SecondException
 	mov	rdi, rax
-.LEHB1:
 	call	__cxa_throw
-.LEHE1:
-.L9:
+.LEHE0:
+.L5:
+	.loc 1 49 9
+	mov	edi, OFFSET FLAT:.LC1
+.LEHB1:
+	call	puts
+	.loc 1 51 1
+	jmp	.L11
+.L8:
 	cmp	rdx, 1
 	je	.L3
+	cmp	rdx, 2
+	je	.L4
 	mov	rdi, rax
-.LEHB2:
 	call	_Unwind_Resume
-.LEHE2:
+.LEHE1:
 .L3:
 .LBB2:
-	.loc 1 9 27
+	.loc 1 36 11
 	mov	rdi, rax
 	call	__cxa_begin_catch
-	mov	QWORD PTR [rbp-32], rax
-	.loc 1 10 11
-	mov	edi, OFFSET FLAT:.LC1
+	.loc 1 37 15
+#APP
+# 37 "raise_exception.cpp" 1
+	nop
+# 0 "" 2
+	.loc 1 38 15
+# 38 "raise_exception.cpp" 1
+	nop
+# 0 "" 2
+	.loc 1 39 15
+# 39 "raise_exception.cpp" 1
+	nop
+# 0 "" 2
+	.loc 1 40 11
+#NO_APP
+	mov	edi, OFFSET FLAT:.LC2
+.LEHB2:
+	call	puts
+	.loc 1 41 11
+	mov	edi, OFFSET FLAT:.LC3
+	call	puts
+.LEHE2:
+	.loc 1 36 11
+	call	__cxa_end_catch
+	jmp	.L5
+.L4:
+.LBE2:
+.LBB3:
+	.loc 1 42 11
+	mov	rdi, rax
+	call	__cxa_begin_catch
+	.loc 1 43 15
+#APP
+# 43 "raise_exception.cpp" 1
+	nop
+# 0 "" 2
+	.loc 1 44 15
+# 44 "raise_exception.cpp" 1
+	nop
+# 0 "" 2
+	.loc 1 45 11
+#NO_APP
+	mov	edi, OFFSET FLAT:.LC4
 .LEHB3:
 	call	puts
+	.loc 1 46 11
+	mov	edi, OFFSET FLAT:.LC5
+	call	puts
 .LEHE3:
-	.loc 1 9 27
+	.loc 1 42 11
 	call	__cxa_end_catch
-	jmp	.L4
-.L10:
+	jmp	.L5
+.L9:
 	mov	rbx, rax
+.LBE3:
+.LBB4:
+	.loc 1 36 11
 	call	__cxa_end_catch
 	mov	rax, rbx
 	mov	rdi, rax
 .LEHB4:
 	call	_Unwind_Resume
-.L11:
-	cmp	rdx, 1
-	je	.L7
-	mov	rdi, rax
-	call	_Unwind_Resume
-.LEHE4:
-.L7:
-.LBE2:
-.LBB3:
-	.loc 1 15 27
-	mov	rdi, rax
-	call	__cxa_begin_catch
-	mov	QWORD PTR [rbp-24], rax
-	.loc 1 16 11
-	mov	edi, OFFSET FLAT:.LC2
-.LEHB5:
-	call	puts
-.LEHE5:
-	.loc 1 15 27
-	call	__cxa_end_catch
-.LBE3:
-	.loc 1 18 9
-	mov	edi, OFFSET FLAT:.LC3
-.LEHB6:
-	call	puts
-	.loc 1 19 1
-	jmp	.L13
-.L12:
+.L10:
 	mov	rbx, rax
-.LBB4:
-	.loc 1 15 27
+.LBE4:
+.LBB5:
+	.loc 1 42 11
 	call	__cxa_end_catch
 	mov	rax, rbx
 	mov	rdi, rax
 	call	_Unwind_Resume
-.LEHE6:
-.L13:
-.LBE4:
-	.loc 1 19 1
+.LEHE4:
+.L11:
+.LBE5:
+	.loc 1 51 1
 	add	rsp, 24
 	pop	rbx
 	pop	rbp
@@ -132,15 +162,15 @@ _Z15unsafe_functionv:
 .LLSDACSB11:
 	.uleb128 .LEHB0-.LFB11
 	.uleb128 .LEHE0-.LEHB0
-	.uleb128 .L9-.LFB11
-	.uleb128 0x1
+	.uleb128 .L8-.LFB11
+	.uleb128 0x3
 	.uleb128 .LEHB1-.LFB11
 	.uleb128 .LEHE1-.LEHB1
-	.uleb128 .L11-.LFB11
-	.uleb128 0x1
+	.uleb128 0
+	.uleb128 0
 	.uleb128 .LEHB2-.LFB11
 	.uleb128 .LEHE2-.LEHB2
-	.uleb128 0
+	.uleb128 .L9-.LFB11
 	.uleb128 0
 	.uleb128 .LEHB3-.LFB11
 	.uleb128 .LEHE3-.LEHB3
@@ -150,155 +180,7 @@ _Z15unsafe_functionv:
 	.uleb128 .LEHE4-.LEHB4
 	.uleb128 0
 	.uleb128 0
-	.uleb128 .LEHB5-.LFB11
-	.uleb128 .LEHE5-.LEHB5
-	.uleb128 .L12-.LFB11
-	.uleb128 0
-	.uleb128 .LEHB6-.LFB11
-	.uleb128 .LEHE6-.LEHB6
-	.uleb128 0
-	.uleb128 0
 .LLSDACSE11:
-	.byte	0x1
-	.byte	0
-	.align 4
-	.long	_ZTI14FirstException
-.LLSDATT11:
-	.text
-	.size	_Z15unsafe_functionv, .-_Z15unsafe_functionv
-	.section	.rodata
-.LC4:
-	.string	"End of handler"
-.LC5:
-	.string	"Caught a First exception"
-.LC6:
-	.string	"Caught a Second exception"
-	.text
-	.globl	_Z7handlerv
-	.type	_Z7handlerv, @function
-_Z7handlerv:
-.LFB12:
-	.loc 1 21 16
-	.cfi_startproc
-	.cfi_personality 0x3,__gxx_personality_v0
-	.cfi_lsda 0x3,.LLSDA12
-	push	rbp
-	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
-	mov	rbp, rsp
-	.cfi_def_cfa_register 6
-	push	rbx
-	sub	rsp, 24
-	.cfi_offset 3, -24
-.LEHB7:
-	.loc 1 23 20
-	call	_Z15unsafe_functionv
-.LEHE7:
-.L18:
-	.loc 1 29 9
-	mov	edi, OFFSET FLAT:.LC4
-.LEHB8:
-	call	puts
-	.loc 1 30 1
-	jmp	.L24
-.L21:
-	cmp	rdx, 1
-	je	.L16
-	cmp	rdx, 2
-	je	.L17
-	mov	rdi, rax
-	call	_Unwind_Resume
-.LEHE8:
-.L16:
-.LBB5:
-	.loc 1 24 27
-	mov	rdi, rax
-	call	__cxa_begin_catch
-	mov	QWORD PTR [rbp-24], rax
-	.loc 1 25 11
-	mov	edi, OFFSET FLAT:.LC5
-.LEHB9:
-	call	puts
-.LEHE9:
-	.loc 1 24 27
-	call	__cxa_end_catch
-	jmp	.L18
-.L17:
-.LBE5:
-.LBB6:
-	.loc 1 26 28
-	mov	rdi, rax
-	call	__cxa_begin_catch
-	mov	QWORD PTR [rbp-32], rax
-	.loc 1 27 11
-	mov	edi, OFFSET FLAT:.LC6
-.LEHB10:
-	call	puts
-.LEHE10:
-	.loc 1 26 28
-	call	__cxa_end_catch
-	jmp	.L18
-.L22:
-	mov	rbx, rax
-.LBE6:
-.LBB7:
-	.loc 1 24 27
-	call	__cxa_end_catch
-	mov	rax, rbx
-	mov	rdi, rax
-.LEHB11:
-	call	_Unwind_Resume
-.L23:
-	mov	rbx, rax
-.LBE7:
-.LBB8:
-	.loc 1 26 28
-	call	__cxa_end_catch
-	mov	rax, rbx
-	mov	rdi, rax
-	call	_Unwind_Resume
-.LEHE11:
-.L24:
-.LBE8:
-	.loc 1 30 1
-	add	rsp, 24
-	pop	rbx
-	pop	rbp
-	.cfi_def_cfa 7, 8
-	ret
-	.cfi_endproc
-.LFE12:
-	.section	.gcc_except_table
-	.align 4
-.LLSDA12:
-	.byte	0xff
-	.byte	0x3
-	.uleb128 .LLSDATT12-.LLSDATTD12
-.LLSDATTD12:
-	.byte	0x1
-	.uleb128 .LLSDACSE12-.LLSDACSB12
-.LLSDACSB12:
-	.uleb128 .LEHB7-.LFB12
-	.uleb128 .LEHE7-.LEHB7
-	.uleb128 .L21-.LFB12
-	.uleb128 0x3
-	.uleb128 .LEHB8-.LFB12
-	.uleb128 .LEHE8-.LEHB8
-	.uleb128 0
-	.uleb128 0
-	.uleb128 .LEHB9-.LFB12
-	.uleb128 .LEHE9-.LEHB9
-	.uleb128 .L22-.LFB12
-	.uleb128 0
-	.uleb128 .LEHB10-.LFB12
-	.uleb128 .LEHE10-.LEHB10
-	.uleb128 .L23-.LFB12
-	.uleb128 0
-	.uleb128 .LEHB11-.LFB12
-	.uleb128 .LEHE11-.LEHB11
-	.uleb128 0
-	.uleb128 0
-.LLSDACSE12:
 	.byte	0x2
 	.byte	0
 	.byte	0x1
@@ -306,45 +188,30 @@ _Z7handlerv:
 	.align 4
 	.long	_ZTI15SecondException
 	.long	_ZTI14FirstException
-.LLSDATT12:
+.LLSDATT11:
 	.text
-	.size	_Z7handlerv, .-_Z7handlerv
+	.size	_Z8handler2v, .-_Z8handler2v
 	.globl	seppuku
 	.type	seppuku, @function
 seppuku:
-.LFB13:
-	.loc 1 32 16
+.LFB12:
+	.loc 1 53 16
 	.cfi_startproc
 	push	rbp
 	.cfi_def_cfa_offset 16
 	.cfi_offset 6, -16
 	mov	rbp, rsp
 	.cfi_def_cfa_register 6
-	.loc 1 33 10
-	call	_Z7handlerv
-	.loc 1 34 1
+	.loc 1 54 11
+	call	_Z8handler2v
+	.loc 1 55 1
 	nop
 	pop	rbp
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE13:
+.LFE12:
 	.size	seppuku, .-seppuku
-	.weak	_ZTI15SecondException
-	.section	.rodata._ZTI15SecondException,"aG",@progbits,_ZTI15SecondException,comdat
-	.align 8
-	.type	_ZTI15SecondException, @object
-	.size	_ZTI15SecondException, 16
-_ZTI15SecondException:
-	.quad	_ZTVN10__cxxabiv117__class_type_infoE+16
-	.quad	_ZTS15SecondException
-	.weak	_ZTS15SecondException
-	.section	.rodata._ZTS15SecondException,"aG",@progbits,_ZTS15SecondException,comdat
-	.align 16
-	.type	_ZTS15SecondException, @object
-	.size	_ZTS15SecondException, 18
-_ZTS15SecondException:
-	.string	"15SecondException"
 	.weak	_ZTI14FirstException
 	.section	.rodata._ZTI14FirstException,"aG",@progbits,_ZTI14FirstException,comdat
 	.align 8
@@ -360,6 +227,21 @@ _ZTI14FirstException:
 	.size	_ZTS14FirstException, 17
 _ZTS14FirstException:
 	.string	"14FirstException"
+	.weak	_ZTI15SecondException
+	.section	.rodata._ZTI15SecondException,"aG",@progbits,_ZTI15SecondException,comdat
+	.align 8
+	.type	_ZTI15SecondException, @object
+	.size	_ZTI15SecondException, 16
+_ZTI15SecondException:
+	.quad	_ZTVN10__cxxabiv117__class_type_infoE+16
+	.quad	_ZTS15SecondException
+	.weak	_ZTS15SecondException
+	.section	.rodata._ZTS15SecondException,"aG",@progbits,_ZTS15SecondException,comdat
+	.align 16
+	.type	_ZTS15SecondException, @object
+	.size	_ZTS15SecondException, 18
+_ZTS15SecondException:
+	.string	"15SecondException"
 	.text
 .Letext0:
 	.file 2 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stddef.h"
@@ -376,7 +258,7 @@ _ZTS14FirstException:
 	.file 13 "<built-in>"
 	.section	.debug_info,"",@progbits
 .Ldebug_info0:
-	.long	0xbb5
+	.long	0xb46
 	.value	0x4
 	.long	.Ldebug_abbrev0
 	.byte	0x8
@@ -1797,90 +1679,38 @@ _ZTS14FirstException:
 	.uleb128 0x28
 	.long	.LASF116
 	.byte	0x1
-	.byte	0x20
+	.byte	0x35
 	.byte	0x6
-	.quad	.LFB13
-	.quad	.LFE13-.LFB13
+	.quad	.LFB12
+	.quad	.LFE12-.LFB12
 	.uleb128 0x1
 	.byte	0x9c
 	.uleb128 0x29
 	.long	.LASF117
 	.byte	0x1
-	.byte	0x15
+	.byte	0x20
 	.byte	0x6
 	.long	.LASF118
-	.quad	.LFB12
-	.quad	.LFE12-.LFB12
-	.uleb128 0x1
-	.byte	0x9c
-	.long	0xb57
-	.uleb128 0x2a
-	.long	.Ldebug_ranges0+0x30
-	.long	0xb43
-	.uleb128 0x2b
-	.string	"x"
-	.byte	0x1
-	.byte	0x18
-	.byte	0x1b
-	.long	0xb57
-	.uleb128 0x2
-	.byte	0x91
-	.sleb128 -40
-	.byte	0
-	.uleb128 0x2c
-	.long	.Ldebug_ranges0+0x60
-	.uleb128 0x2b
-	.string	"x"
-	.byte	0x1
-	.byte	0x1a
-	.byte	0x1c
-	.long	0xb5d
-	.uleb128 0x2
-	.byte	0x91
-	.sleb128 -48
-	.byte	0
-	.byte	0
-	.uleb128 0x2d
-	.byte	0x8
-	.long	0xade
-	.uleb128 0x2d
-	.byte	0x8
-	.long	0xae7
-	.uleb128 0x2e
-	.long	.LASF119
-	.byte	0x1
-	.byte	0x6
-	.byte	0x6
-	.long	.LASF120
 	.quad	.LFB11
 	.quad	.LFE11-.LFB11
 	.uleb128 0x1
 	.byte	0x9c
-	.uleb128 0x2f
-	.quad	.LBB2
-	.quad	.LBE2-.LBB2
-	.long	0xba4
+	.uleb128 0x2a
+	.long	.Ldebug_ranges0+0
+	.long	0xb3a
 	.uleb128 0x2b
-	.string	"x"
-	.byte	0x1
-	.byte	0x9
-	.byte	0x1b
-	.long	0xb57
+	.long	0xade
 	.uleb128 0x2
 	.byte	0x91
-	.sleb128 -48
+	.sleb128 -33
 	.byte	0
 	.uleb128 0x2c
-	.long	.Ldebug_ranges0+0
+	.long	.Ldebug_ranges0+0x30
 	.uleb128 0x2b
-	.string	"x"
-	.byte	0x1
-	.byte	0xf
-	.byte	0x1b
-	.long	0xb57
+	.long	0xae7
 	.uleb128 0x2
 	.byte	0x91
-	.sleb128 -40
+	.sleb128 -33
 	.byte	0
 	.byte	0
 	.byte	0
@@ -2493,8 +2323,6 @@ _ZTS14FirstException:
 	.uleb128 0x18
 	.uleb128 0x2116
 	.uleb128 0x19
-	.uleb128 0x1
-	.uleb128 0x13
 	.byte	0
 	.byte	0
 	.uleb128 0x2a
@@ -2509,14 +2337,6 @@ _ZTS14FirstException:
 	.uleb128 0x2b
 	.uleb128 0x34
 	.byte	0
-	.uleb128 0x3
-	.uleb128 0x8
-	.uleb128 0x3a
-	.uleb128 0xb
-	.uleb128 0x3b
-	.uleb128 0xb
-	.uleb128 0x39
-	.uleb128 0xb
 	.uleb128 0x49
 	.uleb128 0x13
 	.uleb128 0x2
@@ -2528,51 +2348,6 @@ _ZTS14FirstException:
 	.byte	0x1
 	.uleb128 0x55
 	.uleb128 0x17
-	.byte	0
-	.byte	0
-	.uleb128 0x2d
-	.uleb128 0x10
-	.byte	0
-	.uleb128 0xb
-	.uleb128 0xb
-	.uleb128 0x49
-	.uleb128 0x13
-	.byte	0
-	.byte	0
-	.uleb128 0x2e
-	.uleb128 0x2e
-	.byte	0x1
-	.uleb128 0x3f
-	.uleb128 0x19
-	.uleb128 0x3
-	.uleb128 0xe
-	.uleb128 0x3a
-	.uleb128 0xb
-	.uleb128 0x3b
-	.uleb128 0xb
-	.uleb128 0x39
-	.uleb128 0xb
-	.uleb128 0x6e
-	.uleb128 0xe
-	.uleb128 0x11
-	.uleb128 0x1
-	.uleb128 0x12
-	.uleb128 0x7
-	.uleb128 0x40
-	.uleb128 0x18
-	.uleb128 0x2116
-	.uleb128 0x19
-	.byte	0
-	.byte	0
-	.uleb128 0x2f
-	.uleb128 0xb
-	.byte	0x1
-	.uleb128 0x11
-	.uleb128 0x1
-	.uleb128 0x12
-	.uleb128 0x7
-	.uleb128 0x1
-	.uleb128 0x13
 	.byte	0
 	.byte	0
 	.byte	0
@@ -2590,22 +2365,16 @@ _ZTS14FirstException:
 	.quad	0
 	.section	.debug_ranges,"",@progbits
 .Ldebug_ranges0:
-	.quad	.LBB3-.Ltext0
-	.quad	.LBE3-.Ltext0
+	.quad	.LBB2-.Ltext0
+	.quad	.LBE2-.Ltext0
 	.quad	.LBB4-.Ltext0
 	.quad	.LBE4-.Ltext0
 	.quad	0
 	.quad	0
+	.quad	.LBB3-.Ltext0
+	.quad	.LBE3-.Ltext0
 	.quad	.LBB5-.Ltext0
 	.quad	.LBE5-.Ltext0
-	.quad	.LBB7-.Ltext0
-	.quad	.LBE7-.Ltext0
-	.quad	0
-	.quad	0
-	.quad	.LBB6-.Ltext0
-	.quad	.LBE6-.Ltext0
-	.quad	.LBB8-.Ltext0
-	.quad	.LBE8-.Ltext0
 	.quad	0
 	.quad	0
 	.section	.debug_line,"",@progbits
@@ -2728,13 +2497,11 @@ _ZTS14FirstException:
 .LASF49:
 	.string	"stdout"
 .LASF117:
-	.string	"handler"
+	.string	"handler2"
 .LASF45:
 	.string	"_IO_2_1_stdin_"
 .LASF82:
 	.string	"getenv"
-.LASF120:
-	.string	"_Z15unsafe_functionv"
 .LASF104:
 	.string	"long double"
 .LASF17:
@@ -2749,8 +2516,6 @@ _ZTS14FirstException:
 	.string	"_IO_FILE"
 .LASF110:
 	.string	"raise_exception.cpp"
-.LASF109:
-	.string	"GNU C++14 9.3.0 -masm=intel -mtune=generic -march=x86-64 -g -fasynchronous-unwind-tables -fstack-protector-strong"
 .LASF102:
 	.string	"float"
 .LASF41:
@@ -2767,6 +2532,8 @@ _ZTS14FirstException:
 	.string	"atof"
 .LASF79:
 	.string	"atoi"
+.LASF118:
+	.string	"_Z8handler2v"
 .LASF80:
 	.string	"atol"
 .LASF1:
@@ -2813,8 +2580,6 @@ _ZTS14FirstException:
 	.string	"char"
 .LASF100:
 	.string	"strtoull"
-.LASF119:
-	.string	"unsafe_function"
 .LASF42:
 	.string	"_next"
 .LASF9:
@@ -2839,8 +2604,8 @@ _ZTS14FirstException:
 	.string	"stderr"
 .LASF93:
 	.string	"strtoul"
-.LASF118:
-	.string	"_Z7handlerv"
+.LASF109:
+	.string	"GNU C++14 9.3.0 -masm=intel -mtune=generic -march=x86-64 -g -O0 -fasynchronous-unwind-tables -fstack-protector-strong"
 .LASF21:
 	.string	"_IO_backup_base"
 .LASF94:

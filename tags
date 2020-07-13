@@ -1,0 +1,75 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+FirstException	raise_exception.h	/^struct FirstException{} ;$/;"	s
+LSDA_Call_Site	exception_handler.cpp	/^  LSDA_Call_Site(LSDA_ptr *lsda) {$/;"	f	struct:LSDA_Call_Site
+LSDA_Call_Site	exception_handler.cpp	/^struct LSDA_Call_Site {$/;"	s	file:
+LSDA_Call_Site_Header	exception_handler.cpp	/^  LSDA_Call_Site_Header(LSDA_ptr *lsda) {$/;"	f	struct:LSDA_Call_Site_Header
+LSDA_Call_Site_Header	exception_handler.cpp	/^struct LSDA_Call_Site_Header {$/;"	s	file:
+LSDA_Header	exception_handler.cpp	/^  LSDA_Header(LSDA_ptr *lsda) {$/;"	f	struct:LSDA_Header
+LSDA_Header	exception_handler.cpp	/^struct LSDA_Header {$/;"	s	file:
+LSDA_ptr	exception_handler.cpp	/^typedef const uint8_t *LSDA_ptr;$/;"	t	file:
+SecondException	raise_exception.h	/^struct SecondException{} ;$/;"	s
+_Z20__cxa_free_exceptionPv	exception_handler.s	/^_Z20__cxa_free_exceptionPv:$/;"	l
+_Z8handler2v	raise_exception.s	/^_Z8handler2v:$/;"	l
+_ZN10__cxxabiv117__class_type_info3fooEv	exception_handler.s	/^_ZN10__cxxabiv117__class_type_info3fooEv:$/;"	l
+_ZN10__cxxabiv12tiE	exception_handler.s	/^_ZN10__cxxabiv12tiE:$/;"	l
+_ZN11LSDA_HeaderC2EPPKh	exception_handler.s	/^_ZN11LSDA_HeaderC2EPPKh:$/;"	l
+_ZN14LSDA_Call_SiteC2EPPKh	exception_handler.s	/^_ZN14LSDA_Call_SiteC2EPPKh:$/;"	l
+_ZN21LSDA_Call_Site_HeaderC2EPPKh	exception_handler.s	/^_ZN21LSDA_Call_Site_HeaderC2EPPKh:$/;"	l
+_ZNKSt9type_info4nameEv	exception_handler.s	/^_ZNKSt9type_info4nameEv:$/;"	l
+_ZTI14FirstException	raise_exception.s	/^_ZTI14FirstException:$/;"	l
+_ZTI15SecondException	raise_exception.s	/^_ZTI15SecondException:$/;"	l
+_ZTIN10__cxxabiv117__class_type_infoE	exception_handler.s	/^_ZTIN10__cxxabiv117__class_type_infoE:$/;"	l
+_ZTS14FirstException	raise_exception.s	/^_ZTS14FirstException:$/;"	l
+_ZTS15SecondException	raise_exception.s	/^_ZTS15SecondException:$/;"	l
+_ZTSN10__cxxabiv117__class_type_infoE	exception_handler.s	/^_ZTSN10__cxxabiv117__class_type_infoE:$/;"	l
+_ZTVN10__cxxabiv117__class_type_infoE	exception_handler.s	/^_ZTVN10__cxxabiv117__class_type_infoE:$/;"	l
+__class_type_info	exception_handler.cpp	/^    struct __class_type_info {$/;"	s	namespace:__cxxabiv1	file:
+__cxa_allocate_exception	exception_handler.cpp	/^void* __cxa_allocate_exception(size_t thrown_size) {$/;"	f
+__cxa_allocate_exception	exception_handler.s	/^__cxa_allocate_exception:$/;"	l
+__cxa_begin_catch	exception_handler.cpp	/^void __cxa_begin_catch() {$/;"	f
+__cxa_begin_catch	exception_handler.s	/^__cxa_begin_catch:$/;"	l
+__cxa_end_catch	exception_handler.cpp	/^void __cxa_end_catch() {$/;"	f
+__cxa_end_catch	exception_handler.s	/^__cxa_end_catch:$/;"	l
+__cxa_exception	exception_handler.cpp	/^struct __cxa_exception { $/;"	s	file:
+__cxa_free_exception	exception_handler.cpp	/^void __cxa_free_exception(void *exception_ptr) {$/;"	f
+__cxa_throw	exception_handler.cpp	/^void __cxa_throw($/;"	f
+__cxa_throw	exception_handler.s	/^__cxa_throw:$/;"	l
+__cxxabiv1	exception_handler.cpp	/^namespace __cxxabiv1 {$/;"	n	file:
+__gxx_personality_v0	exception_handler.cpp	/^_Unwind_Reason_Code __gxx_personality_v0($/;"	f
+__gxx_personality_v0	exception_handler.s	/^__gxx_personality_v0:$/;"	l
+_main	exception_handler.cpp	/^int _main() {$/;"	f
+action	exception_handler.cpp	/^  unsigned int action; \/\/ 復帰するときにしないといけないこと。デストラクタとか。$/;"	m	struct:LSDA_Call_Site	file:
+actionRecord	exception_handler.cpp	/^	const char *		actionRecord;$/;"	m	struct:__cxa_exception	file:
+adjustedPtr	exception_handler.cpp	/^	void *			adjustedPtr;$/;"	m	struct:__cxa_exception	file:
+catchTemp	exception_handler.cpp	/^	void *			catchTemp;$/;"	m	struct:__cxa_exception	file:
+encoding	exception_handler.cpp	/^  uint8_t encoding;$/;"	m	struct:LSDA_Call_Site_Header	file:
+exceptionDestructor	exception_handler.cpp	/^	void (*exceptionDestructor) (void *); $/;"	m	struct:__cxa_exception	file:
+exceptionType	exception_handler.cpp	/^	std::type_info *	exceptionType;$/;"	m	struct:__cxa_exception	file:
+foo	exception_handler.cpp	/^        virtual void foo() {}$/;"	f	struct:__cxxabiv1::__class_type_info
+handler2	raise_exception.cpp	/^void handler2() {$/;"	f
+handlerCount	exception_handler.cpp	/^	int			handlerCount;$/;"	m	struct:__cxa_exception	file:
+handlerSwitchValue	exception_handler.cpp	/^	int			handlerSwitchValue;$/;"	m	struct:__cxa_exception	file:
+languageSpecificData	exception_handler.cpp	/^	const char *		languageSpecificData;$/;"	m	struct:__cxa_exception	file:
+len	exception_handler.cpp	/^  unsigned int len; \/\/ tryの長さ$/;"	m	struct:LSDA_Call_Site	file:
+length	exception_handler.cpp	/^  uint8_t length;$/;"	m	struct:LSDA_Call_Site_Header	file:
+lp	exception_handler.cpp	/^  unsigned int lp; \/\/ 関数の開始から、最初のcatch文までの長さ$/;"	m	struct:LSDA_Call_Site	file:
+main	main.c	/^int main() {$/;"	f
+nextException	exception_handler.cpp	/^	__cxa_exception *	nextException;$/;"	m	struct:__cxa_exception	file:
+read_uleb	exception_handler.cpp	/^unsigned int read_uleb(LSDA_ptr *lsda) {$/;"	f
+seppuku	raise_exception.cpp	/^void seppuku() {$/;"	f
+seppuku	raise_exception.s	/^seppuku:$/;"	l
+start	exception_handler.cpp	/^  unsigned int start; \/\/ 関数の開始から、それぞれの処理まで$/;"	m	struct:LSDA_Call_Site	file:
+start_encoding	exception_handler.cpp	/^  uint8_t start_encoding;$/;"	m	struct:LSDA_Header	file:
+terminateHandler	exception_handler.cpp	/^	terminate_handler	terminateHandler;$/;"	m	struct:__cxa_exception	file:
+terminate_handler	exception_handler.cpp	/^typedef void (*terminate_handler)(void);$/;"	t	file:
+ti	exception_handler.cpp	/^    } ti;$/;"	m	namespace:__cxxabiv1	typeref:struct:__cxxabiv1::__class_type_info	file:
+type_encoding	exception_handler.cpp	/^  uint8_t type_encoding;$/;"	m	struct:LSDA_Header	file:
+types_table_offset	exception_handler.cpp	/^  uint8_t types_table_offset;$/;"	m	struct:LSDA_Header	file:
+unexpectedHandler	exception_handler.cpp	/^	unexpected_handler	unexpectedHandler;$/;"	m	struct:__cxa_exception	file:
+unexpected_handler	exception_handler.cpp	/^typedef void (*unexpected_handler)(void);$/;"	t	file:
+unwindHeader	exception_handler.cpp	/^	_Unwind_Exception	unwindHeader;$/;"	m	struct:__cxa_exception	file:
