@@ -1,31 +1,3 @@
-// -*- C++ -*- Exception handling and frame unwind runtime interface routines.
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
-// Free Software Foundation, Inc.
-//
-// This file is part of GCC.
-//
-// GCC is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 3, or (at your option)
-// any later version.
-//
-// GCC is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// Under Section 7 of GPL version 3, you are granted additional
-// permissions described in the GCC Runtime Library Exception, version
-// 3.1, as published by the Free Software Foundation.
-
-// You should have received a copy of the GNU General Public License and
-// a copy of the GCC Runtime Library Exception along with this program;
-// see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
-// <http://www.gnu.org/licenses/>.
-
-// This is derived from the C++ ABI for IA-64.  Where we diverge
-// for cross-architecture compatibility are noted with "@@@".
-
 
 #ifndef _UNWIND_CXX_H
 #define _UNWIND_CXX_H 1
@@ -37,8 +9,24 @@
 #include <cstddef>
 #include <bits/atomic_word.h>
 
+/* We only want to use stap probes starting with v3.  Earlier versions
+   added too much startup cost.  */
+#if defined (STAP_PROBE2) && _SDT_NOTE_TYPE >= 3
+#define PROBE2(name, arg1, arg2) STAP_PROBE2 (libstdcxx, name, arg1, arg2)
+#endif
+
+#ifndef PROBE2
+#define PROBE2(name, arg1, arg2)
+#endif
+
 #pragma GCC visibility push(default)
 
+// A primary C++ exception object consists of a header, which is a wrapper
+// around an unwind object header with additional C++ specific information,
+// followed by the exception object itself.
+
+  // Cache parsed handler data from the personality routine Phase 1
+  // for Phase 2 and __cxa_call_unexpected.
 struct __cxa_refcounted_exception
 {
   // Manage this header.
@@ -47,10 +35,19 @@ struct __cxa_refcounted_exception
   __cxa_exception exc;
 };
 
+// A dependent C++ exception object consists of a wrapper around an unwind
+// object header with additional C++ specific information, containing a pointer
+// to a primary exception object.
+
 struct __cxa_dependent_exception
 {
   // The primary exception this thing depends on.
   void *primaryException;
+
+  // Unused member to get similar layout to __cxa_exception, otherwise the
+  // alignment requirements of _Unwind_Exception would require padding bytes
+  // before the unwindHeader member.
+  void (_GLIBCXX_CDTOR_CALLABI *__padding)(void *);
 
   // The C++ standard has entertaining rules wrt calling set_terminate
   // and set_unexpected in the middle of the exception cleanup process.
@@ -71,10 +68,27 @@ struct __cxa_dependent_exception
   const unsigned char *languageSpecificData;
   _Unwind_Ptr catchTemp;
   void *adjustedPtr;
-
+  
   // The generic exception header.  Must be last.
   _Unwind_Exception unwindHeader;
 };
+
+// Each thread in a C++ program has access to a __cxa_eh_globals object.
+struct __cxa_eh_globals
+{
+  __cxa_exception *caughtExceptions;
+  unsigned int uncaughtExceptions;
+};
+
+// @@@ These are not directly specified by the IA-64 C++ ABI.
+
+// Handles re-checking the exception specification if unexpectedHandler
+// throws, and if bad_exception needs to be thrown.  Called from the
+// compiler.
+
+// Handles cleanup from transactional memory restart.
+extern "C" void __cxa_tm_cleanup (void *, void *, unsigned int) throw();
+
 
 // Acquire the C++ exception header from the C++ object.
 static inline __cxa_exception *
