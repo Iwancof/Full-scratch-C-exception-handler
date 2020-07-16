@@ -54,11 +54,13 @@ struct LSDA_Header {
     // lsdaをずらす。
     types_table_offset = read_uleb(lsda);
 
+    /*
     printf(" -- LSDA_Header --\n");
     printf(" start_encoding: %x\n", start_encoding);
     printf(" type_encoding: %x\n", type_encoding);
     printf(" types_table_offset: %x\n", types_table_offset);
     printf(" -----------------\n");
+    */
   }
   uint8_t start_encoding;
   uint8_t type_encoding;
@@ -71,10 +73,12 @@ struct LSDA_Call_Site_Header {
     *lsda = read_ptr + sizeof(encoding);
     length = read_uleb(lsda);
 
+    /*
     printf(" -- LSDA_Call_Site_Header --\n");
     printf(" encoding: %x\n", encoding);
     printf(" length: %x\n", length);
     printf(" ---------------------------\n");
+    */
   }
   uint8_t encoding;
   int length;
@@ -154,13 +158,13 @@ read_sleb128 (const unsigned char *p, _sleb128_t *val)
 
 // 例外用のメモリを確保
 void* __cxa_allocate_exception(size_t thrown_size) {
-  printf("allocate exception. size is %ld\n", thrown_size);
+  //printf("allocate exception. size is %ld\n", thrown_size);
   void* ret = malloc(3 * thrown_size * sizeof(__cxa_exception));
   if(ret == NULL) {
     printf("allocate failed\n");
     exit(0);
   }
-  printf("allocated pointer is %p\n", ret);
+  //printf("allocated pointer is %p\n", ret);
   return ret;
 }
 
@@ -174,10 +178,12 @@ void __cxa_throw(
           void* thrown_exception,
           std::type_info *tinfo,
           void (*dest)(void*)) {
+  /*
   printf("thrown exception!!\n");
   printf("thrown exception pointer is %p\n", thrown_exception);
   printf("tinfo pointer is %p\n", tinfo);
   printf("destractor pointer is %p\n", dest);
+  */
 
   __cxa_exception *header = ((__cxa_exception *)thrown_exception + 1); // -1はわからん
   header->exceptionType = tinfo;
@@ -187,14 +193,40 @@ void __cxa_throw(
 }
 
 void __cxa_begin_catch() {
-  printf("__cxa_begin_catch called\n");
+  //printf("__cxa_begin_catch called\n");
 }
 
 void __cxa_end_catch() {
-  printf("__cxa_end_catch called\n");
+  //printf("__cxa_end_catch called\n");
 }
 
 #include "unwind-cxx.h"
+
+int saved_handler_number;
+_Unwind_Ptr saved_landing_point;
+
+void save_exception_info(
+    _Unwind_Exception* exc,
+    _Unwind_Context* context,
+    int hand_num,
+    _Unwind_Ptr lp
+    ) {
+  saved_handler_number = hand_num;
+  saved_landing_point = lp;
+  /*
+  exc->barrier_cache.sp = _Unwind_GetGR(context, UNWIND_STACK_REG);
+  exc->barrier_cache.bitpattern[1] = hand_num;
+  exc->barrier_cache.bitpattern[3] = lp;
+  */
+}
+
+void store_exception_info(
+    _Unwind_Exception* exc,
+    int* hand_num,
+    _Unwind_Ptr* lp) {
+  *hand_num = saved_handler_number;
+  *lp = saved_landing_point;
+}
 
 
 _Unwind_Reason_Code __gxx_personality_v0(
@@ -203,7 +235,8 @@ _Unwind_Reason_Code __gxx_personality_v0(
     uint64_t exceptionClass,
     _Unwind_Exception *unwind_exception,
     _Unwind_Context *context) {
-  
+
+  /*
   printf(" -- __gxx_personality_v0 args --\n");
   printf(" version: %d\n", version);
   printf(" action: %d\n", action);
@@ -211,23 +244,38 @@ _Unwind_Reason_Code __gxx_personality_v0(
   printf(" unwind_exception at %p\n", unwind_exception );
   printf(" context at %p\n", context);
   printf(" -------------------------------\n");
+  */
 
-  printf("Personality function called: ");
+  //printf("Personality function called: ");
+
+  if(action & _UA_CLEANUP_PHASE) {
+    //printf("cleanup phace2\n");
+    //printf("--- install context ---\n");
+    int hand;
+    _Unwind_Ptr lp;
+    store_exception_info(unwind_exception, &hand, &lp);
+    
+    int r0 = __builtin_eh_return_data_regno(0);
+    int r1 = __builtin_eh_return_data_regno(1);
+
+    _Unwind_SetGR(context, r0, (uintptr_t)unwind_exception);
+    _Unwind_SetGR(context, r1, (uintptr_t)hand);
+    _Unwind_SetIP(context, lp);
+
+    return _URC_INSTALL_CONTEXT;
+  }
 
   if(action & _UA_SEARCH_PHASE) {
-    printf("search phase\n");
-    return _URC_HANDLER_FOUND;
-  } else if(action & _UA_CLEANUP_PHASE) {
-    printf("cleanup phace\n");
+    //printf("search phace\n");
 
     //const uintptr_t throw_ip = _Unwind_GetIP(context) - 1;
     int ip_before_insn = 0;
     uintptr_t throw_ip = _Unwind_GetIPInfo(context, &ip_before_insn);
     if(ip_before_insn == 0){
-      printf("ip_before_insc is zero\n");
+      //printf("ip_before_insc is zero\n");
       throw_ip--;
     }
-    printf("thought in %lx\n", throw_ip + 1);
+    //printf("thought in %lx\n", throw_ip + 1);
 
     LSDA_ptr lsda = (uint8_t*)_Unwind_GetLanguageSpecificData(context);
     
@@ -250,7 +298,7 @@ _Unwind_Reason_Code __gxx_personality_v0(
     //   - 型情報(std::type_infoがコードにはっついている)
     //   
 
-    printf("total call site length is %d\n", cs_header.length);
+    //printf("total call site length is %d\n", cs_header.length);
 
     /*
     for(LSDA_ptr c = lsda; c < lsda_cs_table_end;c++) {
@@ -273,25 +321,24 @@ _Unwind_Reason_Code __gxx_personality_v0(
       if(throw_ip < try_start || try_end < throw_ip) {
 	continue;
       }
-      printf("found Call Site info\n");
+      //printf("found Call Site info\n");
 
-      printf(" -- Call_Site --\n");
-      printf(" start: %u\n", cs.start);
-      printf(" len: %u\n", cs.len);
-      printf(" lp: %u\n", cs.lp);
-      printf(" action: %u\n", cs.action);
-      printf(" ---------------\n");
+      //printf(" -- Call_Site --\n");
+      //printf(" start: %x\n", cs.start);
+      //printf(" len: %x\n", cs.len);
+      //printf(" lp: %x\n", cs.lp);
+      //printf(" action: %x\n", cs.action);
+      //printf(" ---------------\n");
 
       _Unwind_Ptr landing_ptr;
       unsigned char* action_record;
 
       if(cs.lp == 0) {
-	printf("Call site landing ptr is zero!!\n");
+	//printf("Call site landing ptr is zero!!\n");
 	landing_ptr = 0;
       } else {
-	//printf("lading_ptr is initialized\n");
 	landing_ptr = func_start + cs.lp;
-	printf("landing ptr is %lx\n", landing_ptr);
+	//printf("landing ptr is %lx\n", landing_ptr);
       }
       if(cs.action == 0) {
 	action_record = NULL;
@@ -305,7 +352,7 @@ _Unwind_Reason_Code __gxx_personality_v0(
       if( action_record == NULL) {
 	// found cleanup(?)
       }
-      printf("landing_ptr: %ld, action_record at %p\n", landing_ptr, action_record);
+      //printf("landing_ptr: %ld, action_record at %p\n", landing_ptr, action_record);
 
       void* thrown_ptr = __get_object_from_ue(unwind_exception);
       const std::type_info* throw_type = __get_exception_header_from_obj(thrown_ptr)->exceptionType;
@@ -317,39 +364,37 @@ _Unwind_Reason_Code __gxx_personality_v0(
 	read_sleb128(p, &ar_disp);
 	//??
 
-	printf("fil: %ld, dis: %ld\n", ar_filter, ar_disp);
+	//printf("fil: %ld, dis: %ld\n", ar_filter, ar_disp);
 
 	std::type_info* type_ptr = (std::type_info*)(uintptr_t)*(int*)((char*)types_table_start - ar_filter * 4);
-	const char* name = type_ptr->name();
-	// TODO type_ptrがNULLだったらすべての型をキャッチしたい
-	printf("the type is %s\n", name);
-	//bool ret = type_ptr->__do_catch(throw_type, (void**)malloc(100) , 1);
+
+	if(type_ptr == NULL) { 
+          save_exception_info(unwind_exception, context, ar_filter, func_start + cs.lp);
+	  return _URC_HANDLER_FOUND;
+	}
+
+	//printf("checking type is\t%s\n", type_ptr->name());
+	//printf("thrown type is\t\t%s\n", throw_type->name());
+
 	bool ret = strcmp(type_ptr->name(), throw_type->name()) == 0;
 	if(ret) { // Found!!!!!
-	  printf("Found type!!\n");
-	  int r0 = __builtin_eh_return_data_regno(0);
-	  int r1 = __builtin_eh_return_data_regno(1);
-
-	  _Unwind_SetGR(context, r0, (uintptr_t)(unwind_exception));
-	  _Unwind_SetGR(context, r1, (uintptr_t)(ar_filter));
-
-	  _Unwind_SetIP(context, func_start + cs.lp);
-	  return _URC_INSTALL_CONTEXT;
+          save_exception_info(unwind_exception, context, ar_filter, func_start + cs.lp);
+	  //printf("\t Type matched!!!!\n");
+	  return _URC_HANDLER_FOUND;
+	} else {
+	  //printf("\tType didn't match\n");
 	}
 
 	if(ar_disp == 0) {
 	  break;
 	}
-
 	p += ar_disp;
       }
-
-      
-
     }
-    return _URC_NO_REASON;
+    //printf("not found\n");
+    return _URC_CONTINUE_UNWIND;
   } else {
-    printf("unexpected action\n");
+    //printf("unexpected action\n");
     return _URC_FATAL_PHASE1_ERROR;
   }
 }
