@@ -61,9 +61,25 @@ void handler2() {
     red_println("OK"); // ここでキャッチしてほしい！！！！
   }
 }
-
+struct MyException{};
+struct YourException{};
+struct HerException{};
+struct HisException{};
 
 void seppuku() {
-  handler2();
+    try {
+    throw MyException();
+  } catch(YourException) {
+    printf("Caught YourException\n");
+  } catch(HerException) {
+    printf("Caught HerException\n");
+  } catch(HisException) {
+    printf("Caught HisException\n");
+  } catch(MyException) {
+    printf("Caught MyException\n");
+  } catch(...) {
+    printf("Caught Exception\n");
+  }
+  //handler2();
 }
 

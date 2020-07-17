@@ -358,9 +358,9 @@ _Unwind_Reason_Code __gxx_personality_v0(
       const std::type_info* throw_type = __get_exception_header_from_obj(thrown_ptr)->exceptionType;
 
       const unsigned char* p = (unsigned char*)action_table_start + cs.action - 1;
-      long ar_filter, ar_disp;
+      _sleb128_t ar_filter, ar_disp;
       while(1) {
-	p = read_sleb128(p, &ar_filter);
+	p = read_sleb128(p, &ar_filter); //:
 	read_sleb128(p, &ar_disp);
 	//??
 
